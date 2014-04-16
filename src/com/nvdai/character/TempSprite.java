@@ -1,6 +1,8 @@
-package com.nvdai.killgamedemo;
+package com.nvdai.character;
 
 import java.util.List;
+
+import com.nvdai.killgamedemo.GameView;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;

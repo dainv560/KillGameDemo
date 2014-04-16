@@ -3,6 +3,10 @@ package com.nvdai.killgamedemo;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.nvdai.character.Sprite;
+import com.nvdai.character.TempSprite;
+import com.nvdai.weapon.LongBow;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -18,8 +22,10 @@ public class GameView extends SurfaceView {
 	private GameLoopThread gameLoopThread;
 	private List<Sprite> sprites = new ArrayList<Sprite>();
 	private List<TempSprite> temps = new ArrayList<TempSprite>();
+	private LongBow longBow;
 	private long lastClick;
 	private Bitmap bitmapBlood;
+	private Bitmap bitmapLongBow;
 	private Bitmap background = BitmapFactory.decodeResource(getResources(),R.drawable.game_background);
 
 	public GameView(Context context) {
@@ -56,7 +62,7 @@ public class GameView extends SurfaceView {
 
 			}
 		});
-
+		bitmapLongBow = BitmapFactory.decodeResource(getResources(), R.drawable.longbow);
 		bitmapBlood = BitmapFactory.decodeResource(getResources(),
 				R.drawable.blood1);
 	}
@@ -93,6 +99,9 @@ public class GameView extends SurfaceView {
 		for (Sprite sprite : sprites) {
 			sprite.OnDrawer(canvas);
 		}
+		
+		longBow = new LongBow(this, bitmapLongBow);
+		longBow.OnDrawer(canvas);
 	}
 
 	private Sprite createSprite(int resouce) {
