@@ -26,6 +26,7 @@ public class GameView extends SurfaceView {
 	private long lastClick;
 	private Bitmap bitmapBlood;
 	private Bitmap bitmapLongBow;
+	private Bitmap bitmapLongBowPull;
 	private Bitmap background = BitmapFactory.decodeResource(getResources(),R.drawable.game_background);
 
 	public GameView(Context context) {
@@ -63,6 +64,8 @@ public class GameView extends SurfaceView {
 			}
 		});
 		bitmapLongBow = BitmapFactory.decodeResource(getResources(), R.drawable.longbow);
+		bitmapLongBowPull = BitmapFactory.decodeResource(getResources(), R.drawable.longbow_pull);
+		longBow = new LongBow(this, bitmapLongBow, bitmapLongBowPull);
 		bitmapBlood = BitmapFactory.decodeResource(getResources(),
 				R.drawable.blood1);
 	}
@@ -92,7 +95,7 @@ public class GameView extends SurfaceView {
 	@Override
 	protected void onDraw(Canvas canvas) {
 		canvas.drawColor(Color.BLACK);
-		canvas.drawBitmap(background, 0, 0, null);
+		//canvas.drawBitmap(background, 0, 0, null);
 		for (int i = temps.size() - 1; i >= 0; i--) {
 			temps.get(i).onDraw(canvas);
 		}
@@ -100,8 +103,7 @@ public class GameView extends SurfaceView {
 			sprite.OnDrawer(canvas);
 		}
 		
-		longBow = new LongBow(this, bitmapLongBow);
-		longBow.OnDrawer(canvas);
+		//longBow.OnDrawer(canvas);
 	}
 
 	private Sprite createSprite(int resouce) {

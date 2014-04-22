@@ -12,9 +12,9 @@ public class Sprite {
 	int[] DIRECTION_TO_ANIMATION_MAP = { 3, 1, 0, 2 };
 	private static final int BMP_ROWS = 4;
 	private static final int BMP_COLUMNS = 3;
-	private static final int MAX_SPEED = 10;
+	private static final int MAX_SPEED = 5;
 	private int x = 0;
-	private int y = 200;
+	private int y = 0;
 	private int xSpeed;
 	private int ySpeed;
 	private GameView gameView;
@@ -31,9 +31,11 @@ public class Sprite {
 
 		Random rnd = new Random();
 		x = rnd.nextInt(gameView.getWidth() - width);
-		y = rnd.nextInt(gameView.getHeight() - height);
-		xSpeed = rnd.nextInt(MAX_SPEED * 2) - MAX_SPEED;
-		ySpeed = rnd.nextInt(MAX_SPEED * 2) - MAX_SPEED;
+		//y = rnd.nextInt(gameView.getHeight() - height);
+		xSpeed = rnd.nextInt(MAX_SPEED / 2);
+		while (ySpeed == 0){
+			ySpeed = rnd.nextInt(MAX_SPEED);
+		}
 	}
 
 	private void update() {
