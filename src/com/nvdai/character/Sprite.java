@@ -31,9 +31,9 @@ public class Sprite {
 
 		Random rnd = new Random();
 		x = rnd.nextInt(gameView.getWidth() - width);
-		//y = rnd.nextInt(gameView.getHeight() - height);
+		// y = rnd.nextInt(gameView.getHeight() - height);
 		xSpeed = rnd.nextInt(MAX_SPEED / 2);
-		while (ySpeed == 0){
+		while (ySpeed == 0) {
 			ySpeed = rnd.nextInt(MAX_SPEED);
 		}
 	}
@@ -67,7 +67,17 @@ public class Sprite {
 	}
 
 	public boolean isCollition(float x2, float y2) {
-		return x2 > x && x2 < x + width && y2 > y && y2 < y + height;
+		return x2 + 50 > x && x2 - 50 < x + width && y2 + 50 > y
+				&& y2 - 50 < y + height;
 	}
+
+	public int getX() {
+		return x;
+	}
+
+	public int getY() {
+		return y;
+	}
+	
 
 }

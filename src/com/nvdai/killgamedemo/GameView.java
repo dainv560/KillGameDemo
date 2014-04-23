@@ -2,10 +2,7 @@ package com.nvdai.killgamedemo;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import com.nvdai.character.Sprite;
-import com.nvdai.character.TempSprite;
-import com.nvdai.weapon.LongBow;
+import java.util.Random;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -13,21 +10,30 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Paint.Align;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+
+import com.nvdai.character.Sprite;
+import com.nvdai.character.TempSprite;
+import com.nvdai.weapon.Ball;
 
 public class GameView extends SurfaceView {
 	private SurfaceHolder holder;
 	private GameLoopThread gameLoopThread;
 	private List<Sprite> sprites = new ArrayList<Sprite>();
 	private List<TempSprite> temps = new ArrayList<TempSprite>();
-	private LongBow longBow;
+	private Ball longBow;
 	private long lastClick;
 	private Bitmap bitmapBlood;
-	private Bitmap bitmapLongBow;
-	private Bitmap bitmapLongBowPull;
-	private Bitmap background = BitmapFactory.decodeResource(getResources(),R.drawable.game_background);
+	private int score = 0;
+	private int image[] = { R.drawable.bad1, R.drawable.bad2, R.drawable.bad3,
+			R.drawable.bad4, R.drawable.good1, R.drawable.good2 };
+
+	// private Bitmap background =
+	// BitmapFactory.decodeResource(getResources(),R.drawable.game_background);
 
 	public GameView(Context context) {
 		super(context);
@@ -52,6 +58,7 @@ public class GameView extends SurfaceView {
 			@Override
 			public void surfaceCreated(SurfaceHolder holder) {
 				createSprites();
+				longBow = createWeapon(R.drawable.ball);
 				gameLoopThread.setRunning(true);
 				gameLoopThread.start();
 
@@ -63,52 +70,54 @@ public class GameView extends SurfaceView {
 
 			}
 		});
-		bitmapLongBow = BitmapFactory.decodeResource(getResources(), R.drawable.longbow);
-		bitmapLongBowPull = BitmapFactory.decodeResource(getResources(), R.drawable.longbow_pull);
-		longBow = new LongBow(this, bitmapLongBow, bitmapLongBowPull);
+
 		bitmapBlood = BitmapFactory.decodeResource(getResources(),
 				R.drawable.blood1);
 	}
 
-	private void createSprites() {
-		sprites.add(createSprite(R.drawable.bad1));
-		sprites.add(createSprite(R.drawable.bad2));
-		sprites.add(createSprite(R.drawable.bad3));
-		sprites.add(createSprite(R.drawable.bad4));
-		sprites.add(createSprite(R.drawable.good1));
-		sprites.add(createSprite(R.drawable.good2));
-		sprites.add(createSprite(R.drawable.bad1));
-		sprites.add(createSprite(R.drawable.bad2));
-		sprites.add(createSprite(R.drawable.bad3));
-		sprites.add(createSprite(R.drawable.bad4));
-		sprites.add(createSprite(R.drawable.good1));
-		sprites.add(createSprite(R.drawable.good2));
-		sprites.add(createSprite(R.drawable.bad1));
-		sprites.add(createSprite(R.drawable.bad2));
-		sprites.add(createSprite(R.drawable.bad3));
-		sprites.add(createSprite(R.drawable.bad4));
-		sprites.add(createSprite(R.drawable.good1));
-		sprites.add(createSprite(R.drawable.good2));
+	public void createSprites() {
+		Random rnd = new Random(System.currentTimeMillis());
+		int check;
+		for (int i = 0 ;i <10;i++){
+			check = rnd.nextInt(100);
+			if (check < 80){
+				sprites.add(createSprite(image[check % 6]));
+			}
+		}
 	}
 
 	@SuppressLint("WrongCall")
 	@Override
 	protected void onDraw(Canvas canvas) {
-		canvas.drawColor(Color.BLACK);
-		//canvas.drawBitmap(background, 0, 0, null);
+		canvas.drawColor(Color.WHITE);
+		Paint paint = new Paint();
+
+		paint.setColor(Color.BLACK);
+		paint.setTextSize(20);
+		paint.setAntiAlias(true);
+		paint.setTextAlign(Align.LEFT);
+		canvas.drawText("SCORE: " + score, (int) (this.getWidth() * 0.6), 50,
+				paint);
+		// canvas.drawBitmap(background, 0, 0, null);
 		for (int i = temps.size() - 1; i >= 0; i--) {
 			temps.get(i).onDraw(canvas);
 		}
 		for (Sprite sprite : sprites) {
 			sprite.OnDrawer(canvas);
 		}
-		
-		//longBow.OnDrawer(canvas);
+
+		longBow.OnDrawer(canvas);
+
 	}
 
 	private Sprite createSprite(int resouce) {
 		Bitmap bitmap = BitmapFactory.decodeResource(getResources(), resouce);
 		return new Sprite(this, bitmap);
+	}
+
+	private Ball createWeapon(int resouce) {
+		Bitmap bitmap = BitmapFactory.decodeResource(getResources(), resouce);
+		return new Ball(this, bitmap);
 	}
 
 	@Override
@@ -117,18 +126,29 @@ public class GameView extends SurfaceView {
 			lastClick = System.currentTimeMillis();
 			float x = event.getX();
 			float y = event.getY();
-			synchronized (getHolder()) {
-				for (int i = sprites.size() - 1; i >= 0; i--) {
-					Sprite sprite = sprites.get(i);
-					if (sprite.isCollition(event.getX(), event.getY())) {
-						sprites.remove(sprite);
-						temps.add(new TempSprite(temps, this, x, y, bitmapBlood));
-						break;
-					}
+			longBow.setGoal(x, y);
+		}
+		return true;
+	}
+
+	public void destroyBall() {
+		longBow = createWeapon(R.drawable.ball);
+	}
+
+	public void killCharacter(float x, float y) {
+		synchronized (getHolder()) {
+			for (int i = sprites.size() - 1; i >= 0; i--) {
+				Sprite sprite = sprites.get(i);
+				if (sprite.isCollition(x, y)) {
+					int xTemp = sprite.getX();
+					int yTemp = sprite.getY();
+					sprites.remove(sprite);
+					score++;
+					temps.add(new TempSprite(temps, this, xTemp, yTemp,
+							bitmapBlood));
 				}
 			}
 		}
-		return true;
 	}
 
 }

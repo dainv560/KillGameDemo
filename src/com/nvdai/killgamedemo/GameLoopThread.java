@@ -7,6 +7,7 @@ public class GameLoopThread extends Thread {
 	static final long FPS = 10;
 	private GameView view;
 	private boolean running = false;
+	private int count = 0;
 
 	public GameLoopThread(GameView view) {
 		this.view = view;
@@ -24,9 +25,14 @@ public class GameLoopThread extends Thread {
 
 		while (running) {
 			Canvas c = null;
+			count++;
 			startTime = System.currentTimeMillis();
 			try {
 				c = view.getHolder().lockCanvas();
+				if (count == 30){
+					count =0;
+					view.createSprites();
+				}
 				synchronized (view.getHolder()) {
 					view.onDraw(c);
 				}
