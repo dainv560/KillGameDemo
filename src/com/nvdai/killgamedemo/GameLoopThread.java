@@ -8,6 +8,9 @@ public class GameLoopThread extends Thread {
 	private GameView view;
 	private boolean running = false;
 	private int count = 0;
+	private static int MAX_COUNT = 50;
+	private static int MIN_COUNT = 10;
+	private static boolean lose = false;
 
 	public GameLoopThread(GameView view) {
 		this.view = view;
@@ -29,9 +32,13 @@ public class GameLoopThread extends Thread {
 			startTime = System.currentTimeMillis();
 			try {
 				c = view.getHolder().lockCanvas();
-				if (count == 30){
-					count =0;
+				if (count == MAX_COUNT) {
+					count = 0;
 					view.createSprites();
+				}
+				if (lose) {
+					view.endGame(c);
+					break;
 				}
 				synchronized (view.getHolder()) {
 					view.onDraw(c);
@@ -42,16 +49,26 @@ public class GameLoopThread extends Thread {
 				}
 			}
 			sleepTime = ticksPS - (System.currentTimeMillis() - startTime);
-			try {
-				if (sleepTime > 0) {
-					sleep(sleepTime);
-				} else {
-					sleep(10);
-				}
-			} catch (Exception e) {
-			}
+			// try {
+			// if (sleepTime > 0) {
+			// sleep(sleepTime);
+			// } else {
+			// sleep(10);
+			// }
+			// } catch (Exception e) {
+			// }
 
 		}
+	}
+
+	public void setMaxCount(int x) {
+		if (MAX_COUNT >= MIN_COUNT) {
+			MAX_COUNT = 50 - x/5;
+		}
+	}
+
+	public void setLose() {
+		lose = true;
 	}
 
 }

@@ -25,7 +25,7 @@ public class GameView extends SurfaceView {
 	private GameLoopThread gameLoopThread;
 	private List<Sprite> sprites = new ArrayList<Sprite>();
 	private List<TempSprite> temps = new ArrayList<TempSprite>();
-	private Ball longBow;
+	private Ball ball;
 	private long lastClick;
 	private Bitmap bitmapBlood;
 	private int score = 0;
@@ -58,7 +58,7 @@ public class GameView extends SurfaceView {
 			@Override
 			public void surfaceCreated(SurfaceHolder holder) {
 				createSprites();
-				longBow = createWeapon(R.drawable.ball);
+				ball = createWeapon(R.drawable.ball);
 				gameLoopThread.setRunning(true);
 				gameLoopThread.start();
 
@@ -78,9 +78,9 @@ public class GameView extends SurfaceView {
 	public void createSprites() {
 		Random rnd = new Random(System.currentTimeMillis());
 		int check;
-		for (int i = 0 ;i <10;i++){
+		for (int i = 0; i < 3; i++) {
 			check = rnd.nextInt(100);
-			if (check < 80){
+			if (check < 80) {
 				sprites.add(createSprite(image[check % 6]));
 			}
 		}
@@ -92,12 +92,6 @@ public class GameView extends SurfaceView {
 		canvas.drawColor(Color.WHITE);
 		Paint paint = new Paint();
 
-		paint.setColor(Color.BLACK);
-		paint.setTextSize(20);
-		paint.setAntiAlias(true);
-		paint.setTextAlign(Align.LEFT);
-		canvas.drawText("SCORE: " + score, (int) (this.getWidth() * 0.6), 50,
-				paint);
 		// canvas.drawBitmap(background, 0, 0, null);
 		for (int i = temps.size() - 1; i >= 0; i--) {
 			temps.get(i).onDraw(canvas);
@@ -106,7 +100,14 @@ public class GameView extends SurfaceView {
 			sprite.OnDrawer(canvas);
 		}
 
-		longBow.OnDrawer(canvas);
+		ball.OnDrawer(canvas);
+
+		paint.setColor(Color.BLACK);
+		paint.setTextSize(20);
+		paint.setAntiAlias(true);
+		paint.setTextAlign(Align.LEFT);
+		canvas.drawText("SCORE: " + score, (int) (this.getWidth() * 0.6), 50,
+				paint);
 
 	}
 
@@ -126,13 +127,13 @@ public class GameView extends SurfaceView {
 			lastClick = System.currentTimeMillis();
 			float x = event.getX();
 			float y = event.getY();
-			longBow.setGoal(x, y);
+			ball.setGoal(x, y);
 		}
 		return true;
 	}
 
 	public void destroyBall() {
-		longBow = createWeapon(R.drawable.ball);
+		ball = createWeapon(R.drawable.ball);
 	}
 
 	public void killCharacter(float x, float y) {
@@ -140,15 +141,32 @@ public class GameView extends SurfaceView {
 			for (int i = sprites.size() - 1; i >= 0; i--) {
 				Sprite sprite = sprites.get(i);
 				if (sprite.isCollition(x, y)) {
-					int xTemp = sprite.getX();
-					int yTemp = sprite.getY();
+					float xTemp = sprite.getX();
+					float yTemp = sprite.getY();
 					sprites.remove(sprite);
 					score++;
+					gameLoopThread.setMaxCount(score);
 					temps.add(new TempSprite(temps, this, xTemp, yTemp,
 							bitmapBlood));
 				}
 			}
 		}
+	}
+
+	public void loseGame() {
+		gameLoopThread.setLose();
+	}
+
+	public void endGame(Canvas canvas) {
+		Paint paint = new Paint();
+		paint.setColor(Color.RED);
+		paint.setTextSize(40);
+		paint.setAntiAlias(true);
+		paint.setTextAlign(Align.CENTER);
+		canvas.drawText("End Game", (int) (this.getWidth() *0.5),
+				(int) (this.getHeight() * 0.4), paint);
+		canvas.drawText("Score: " + score, (int) (this.getWidth() *0.5),
+				(int) (this.getHeight() * 0.6), paint);
 	}
 
 }

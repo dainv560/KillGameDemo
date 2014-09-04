@@ -19,9 +19,10 @@ public class Ball {
 	private float yGoal = -1;
 	private float xCenter = -1;
 	private float yCenter = -1;
-	private static final int MAX_SPEED = 70;
+	private static final int MAX_SPEED = 25;
 	private int width;
 	private int height;
+	private boolean shooting = true;
 
 	public Ball(GameView gameView, Bitmap bitmap) {
 		this.gameView = gameView;
@@ -53,20 +54,24 @@ public class Ball {
 				}
 			}
 		}
-		if (y >= yCenter && !isCollition(xCenter, yCenter)) {
+		if (y >= yCenter-bitmap.getHeight()/2 && !isCollition(xCenter, yCenter)) {
 			x = x + xSpeed;
 			y = y + ySpeed;
 		} else {
 			gameView.killCharacter(x, y);
 			gameView.destroyBall();
+			shooting = true;
 		}
 	}
 
 	public void setGoal(float xCenter, float yCenter) {
-		this.xCenter = xCenter;
-		this.yCenter = yCenter;
-		this.xGoal = xCenter - bitmap.getWidth() / 2;
-		this.yGoal = yCenter - bitmap.getHeight() / 2;
+		if (shooting){
+			this.xCenter = xCenter;
+			this.yCenter = yCenter;
+			this.xGoal = xCenter - bitmap.getWidth() / 2;
+			this.yGoal = yCenter - bitmap.getHeight() / 2;
+			shooting = false;
+		}
 	}
 
 	public void OnDrawer(Canvas canvas) {
